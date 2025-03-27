@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block actions_js %}
+    {% if sair_is_here %}
+        let valor = getCookieValue('atun');
+
+        if (valor === 'true') {
+            sair.setInteractive();
+            sair.on('pointerdown', () => {
+                Swal.fire({
+                    imageUrl: '{{ url_for("get_image", filename="huevito.png") }}',
+                    imageAlt: "A tall image",
+                    text: "✨ Te comiste el huevito con atún. Creces en puntos de bienestar y hogar. ¡Sabe a amor casero! 💛",
+                    imageWidth: 100,
+                    imageHeight: 100,
+                })
+            });
+        } else {
+            console.log("Aún no has conseguido el atun");
+        }
+    
+    {% endif %}
+
+    items['door'].setInteractive();
+    items['door'].on('pointerdown', () => {
+        window.location.href = '/rest_room';
+    });
+
+{% endblock %}

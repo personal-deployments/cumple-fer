@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block actions_js %}
+    if ("atun" in items) {    
+        items['atun'].setInteractive();
+        items['atun'].on('pointerdown', () => {
+            Swal.fire({
+                imageUrl: '{{ url_for("get_image", filename="atun.png") }}',
+                imageAlt: "A tall image",
+                text: "Mientras explorabas, encontraste una lata de atún cerrada. \n ¿Quieres pedirle a Sair que prepare un delicioso atún con huevito?",
+                imageWidth: 100,
+                imageHeight: 100,
+                showCancelButton: true,
+                confirmButtonText: 'Sí, pedir atún',
+                cancelButtonText: 'No, no quiero',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.cookie = "atun=true; path=/";
+                    Swal.fire({
+                        text: "La proxima vez que encuentres a sair en la cocina te dara un huevito con atún.",
+                    })
+                } 
+            });
+        });
+
+        this.tweens.add({
+            targets: items['atun'],
+            y: '+=20',            // Sube 20 píxeles
+            ease: 'Quad.easeInOut',
+            duration: 1000,        // Tiempo para subir
+            yoyo: true,           // Baja después de subir
+            repeat: -1  
+        });
+    }
+    if ("pintura" in items) {    
+        items['pintura'].setInteractive();
+        items['pintura'].on('pointerdown', () => {
+            Swal.fire({
+                imageUrl: '{{ url_for("get_image", filename="marcadores.png") }}',
+                imageAlt: "A tall image",
+                text: "¡Encontraste unos marcadores y pinturas de colores brillantes!\n¿Quieres usarlos para pintar la columna de tu cuarto y dejar volar tu creatividad?",
+                imageWidth: 100,
+                imageHeight: 100,
+                showCancelButton: true,
+                confirmButtonText: 'Sí, Pintar',
+                cancelButtonText: 'No, no quiero',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.open('https://photos.app.goo.gl/UkCEif1PXLNDhbff8', '_blank');
+                    //https://photos.app.goo.gl/UkCEif1PXLNDhbff8
+                } 
+            });
+        });
+
+        this.tweens.add({
+            targets: items['pintura'],
+            y: '+=20',            // Sube 20 píxeles
+            ease: 'Quad.easeInOut',
+            duration: 1000,        // Tiempo para subir
+            yoyo: true,           // Baja después de subir
+            repeat: -1  
+        });
+    }
+
+    items['door'].setInteractive();
+    items['door'].on('pointerdown', () => {
+        window.location.href = '/rest_room';
+    });
+
+{% endblock %}

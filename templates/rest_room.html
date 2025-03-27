@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block actions_js %}
+    {% if sair_is_here %}
+            sair.setInteractive();
+            sair.on('pointerdown', () => {
+                Swal.fire({
+                    imageUrl: '{{ url_for("get_image", filename="sair.png") }}',
+                    imageAlt: "A tall image",
+                    text: "Te acercas a la sala y ves a Sair cómodo en el sofá. Con una sonrisa te dice: '¿Quieres ver una peli conmigo?' ",
+                    imageWidth: 100,
+                    imageHeight: 100,
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, Ver peli',
+                    cancelButtonText: 'No, no quiero',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.open('https://drive.google.com/file/d/1-9WH4DOnwzjrDH98pZQnHSmUh9-VMXLu/view?usp=sharing', '_blank');
+                        //https://photos.app.goo.gl/UkCEif1PXLNDhbff8
+                    } 
+                });
+            });
+    {% endif %}
+
+    if ("emmy" in items) {    
+        items['emmy'].setInteractive();
+        items['emmy'].on('pointerdown', () => {
+            Swal.fire({
+                imageUrl: '{{ url_for("get_image", filename="emmy.png") }}',
+                imageAlt: "A tall image",
+                text: "Entre las sombras del camino, aparece Emmy, tu mejor amiga felina. Ha estado contigo en los momentos más difíciles, y ahora vuelve a acompañarte.",
+                imageWidth: 100,
+                imageHeight: 100,
+                showCancelButton: true,
+                confirmButtonText: 'Abrazarla',
+                cancelButtonText: 'Seguir caminando juntos',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.open('https://photos.app.goo.gl/pEb7Us8T6dRXiC297', '_blank');
+                    //https://photos.app.goo.gl/UkCEif1PXLNDhbff8
+                } 
+            });
+        });
+    }
+
+    items['door'].setInteractive();
+    items['door'].on('pointerdown', () => {
+        window.location.href = '/chicken';
+    });
+    items['door_2'].setInteractive();
+    items['door_2'].on('pointerdown', () => {
+        window.location.href = '/fer_room';
+    });
+    items['door_3'].setInteractive();
+    items['door_3'].on('pointerdown', () => {
+        window.location.href = '/sair_room';
+    });
+{% endblock %}

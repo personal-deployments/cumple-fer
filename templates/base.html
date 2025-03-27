@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Nuestro Mundo</title>
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      height: 100%;
+      width: 100%;
+    }
+
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+<script>
+  let items = {};
+  const tileWidth = 100;
+  const tileHeight = 50;
+  const mapWidth = {{ roomWidth or 10 }};
+  const mapHeight = {{ roomHeight or 10 }};;
+  let player;
+  let cursors;
+  let centerX = window.innerWidth / 2;
+
+  function getCookieValue(name) {
+      const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+      return match ? match[2] : null;
+  }
+
+  const config = {
+    type: Phaser.AUTO,
+    width: window.innerWidth,
+    height: window.innerHeight,
+    backgroundColor: '#2d2d2d',
+    physics: {
+      default: 'arcade'
+    },
+    scene: {
+      preload,
+      create,
+      update,
+      extend: {
+        resize
+      }
+    },
+    scale: {
+      mode: Phaser.Scale.RESIZE,
+      autoCenter: Phaser.Scale.CENTER_BOTH
+    }
+  };
+
+  const game = new Phaser.Game(config);
+
+  function preload() {
+    {% for img in images %}
+        this.load.image('{{ img.key }}', '{{ url_for("get_image", filename=img.filename) }}');
+    {% endfor %}
+
+    this.load.image('sair', '{{ url_for("get_image", filename="sair.png") }}');
+  }
+
+  function create() {
+    centerX = (this.scale.width  / 2) - {{ offSet or 0 }};
+
+    // Dibujar la grilla isométrica
+    for (let y = 0; y < mapHeight; y++) {
+      for (let x = 0; x < mapWidth; x++) {
+        const pos = cartesianToIsometric(x, y, centerX);
+        const tile = this.add.graphics();
+        tile.fillStyle(0xbcbcbc, 1);
+        tile.beginPath();
+        tile.moveTo(pos.x, pos.y);
+        tile.lineTo(pos.x + tileWidth / 2, pos.y + tileHeight / 2);
+        tile.lineTo(pos.x, pos.y + tileHeight);
+        tile.lineTo(pos.x - tileWidth / 2, pos.y + tileHeight / 2);
+        tile.closePath();
+        tile.fillPath();
+      }
+    }
+
+    // Agregar cama
+    {% for obj in images %}
+        {
+        const pos = cartesianToIsometric({{ obj.x  }}, {{ obj.y  }}, centerX);
+        const item = this.add.image(pos.x, pos.y + tileHeight / 4, '{{ obj.key }}');
+        item.setOrigin(0.5, 1);
+        item.displayWidth = tileWidth * {{ obj.scale_x|default(1) }};
+        item.displayHeight = tileHeight * {{ obj.scale_y|default(2) }};
+        items['{{ obj.key }}'] = item;
+        }
+    {% endfor %}
+
+    {% if sair_is_here %}
+        let pos = cartesianToIsometric(2, 2, centerX);
+        const sair = this.add.image(pos.x, pos.y + tileHeight / 4, 'sair');
+        sair.setOrigin(0.5, 1);
+        sair.displayWidth = tileWidth * 2;
+        sair.displayHeight = tileHeight * 4;
+
+        this.tweens.add({
+            targets: sair,
+            x: '+=30',            // Sube 20 píxeles
+            ease: 'Quad.easeInOut',
+            duration: 1000,        // Tiempo para subir
+            yoyo: true,           // Baja después de subir
+            repeat: -1  
+        });
+    {% endif %}
+
+    {% block actions_js %}
+    {% endblock %}
+
+    
+
+    // Evento de redimensionamiento
+    this.scale.on('resize', resize, this);
+  }
+
+  function update() {
+    
+  }
+
+  function movePlayer(dx, dy) {
+    const newX = player.gridX + dx;
+    const newY = player.gridY + dy;
+
+    if (newX >= 0 && newX < mapWidth && newY >= 0 && newY < mapHeight) {
+      player.gridX = newX;
+      player.gridY = newY;
+      const pos = cartesianToIsometric(newX, newY, centerX);
+      player.x = pos.x;
+      player.y = pos.y + tileHeight / 4;
+    }
+  }
+
+  function cartesianToIsometric(x, y, centerX) {
+    const isoX = (x - y) * tileWidth / 2 + centerX;
+    const isoY = (x + y) * tileHeight / 2 + 50 + {{ offSet or 0 }};
+    return { x: isoX, y: isoY };
+  }
+
+  function resize(gameSize) {
+    const width = gameSize.width;
+    const height = gameSize.height;
+    centerX = width / 2;
+  }
+</script>
+</body>
+</html>
